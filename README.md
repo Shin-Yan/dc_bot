@@ -17,8 +17,13 @@ $ npm install ffmpeg-static
 $ npm install @discordjs/opus
 $ npm install ytdl-core
 ```
-
-3. Start your dc bot
+3. Set your dc token in the token.json file (create it by yourself)
+``` js
+{
+    "token": <your discord token>
+}
+```
+4. Start your dc bot
 ``` command
 $ node response_bot.js // for response bot
 $ node music_bot.js // for music bot
