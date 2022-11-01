@@ -1,0 +1,24 @@
+{
+  "name": "dc_bot",
+  "version": "1.0.0",
+  "description": "First, you need to install node and npm. If you don't know what is node or npm, watch the following documentations. node: https://nodejs.org/en/docs/ npm: https://docs.npmjs.com/ ``` command sudo apt-get update sudo apt-get install node sudo apt-get install npm ```",
+  "main": "bingo_bot.js",
+  "dependencies": {
+    "discord": "^0.8.2",
+    "discord.js": "^12.5.3",
+    "ytdl-core": "^4.11.2"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Shin-Yan/dc_bot.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Shin-Yan/dc_bot/issues"
+  },
+  "homepage": "https://github.com/Shin-Yan/dc_bot#readme"
+}
