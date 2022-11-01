@@ -1,5 +1,5 @@
 # Javascript DisCord bot
-1. You need to install node and npm first. If you don't know what is node or npm, watch the following documentations.
+1. You need to install node and npm first. If you don't know what is node or npm, watch the following documentations.  
 node: https://nodejs.org/en/docs/  
 npm: https://docs.npmjs.com/  
 music bot ref: https://b-l-u-e-b-e-r-r-y.github.io/post/DiscordBot01/
