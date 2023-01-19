@@ -121,13 +121,13 @@ class Music {
             //打開.txt檔, 將其content切割放入List
             const fileContent = fs.readFileSync(combo_name);
             const line = fileContent.toString().split('\n');
-            line.forEach(element => {
+            line.forEach(async(element) => {
                 msg.content = element;
-                music.play(msg);
+                await(music.play(msg));
             });
         }
         else{
-            msg.reply('此combo不在list中')
+            msg.channel.send('此combo不在list中')
             return;
         }
     }
