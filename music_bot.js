@@ -66,14 +66,16 @@ class Music {
         // 如果 Bot 還沒加入該語音群的語音頻道
         if (!this.connection[guildID]) {
             msg.channel.send('請先將機器人 `!!join` 加入頻道');
-            return;
+            return false;
         }
 
         // 如果 Bot leave 後又未加入語音頻道
         if (this.connection[guildID].status === 4) {
             msg.channel.send('請先將機器人 `!!join` 重新加入頻道');
-            return;
+            return false;
         }
+
+        return true;
     }
     async play(msg) {
         const guildID = msg.guild.id;
@@ -131,7 +133,6 @@ class Music {
     }
 
     playMusic(msg, guildID, musicInfo) {
-        // console.log(guildID);
         // 提示播放音樂
         msg.channel.send(`播放音樂：${musicInfo.name}`);
 
@@ -234,13 +235,14 @@ const music = new Music();
 // 當 Bot 接收到訊息時的事件
 client.on('message', async (msg) => {
     // 如果發送訊息的地方不是語音群（可能是私人），就 return
-    if (!msg.guild) return;
-
+    if(!msg.guild) return;
+    if(msg.author.bot) return;
     // !!join
     if (msg.content === `${prefix}join`) {
 
         // 機器人加入語音頻道
         music.join(msg);
+        return;
     }
 
     // 如果使用者輸入的內容中包含 !!play
@@ -250,14 +252,17 @@ client.on('message', async (msg) => {
         if (msg.member.voice.channel) {
 
             //檢查機器人status
-            await music.check_status(msg);
+            let res = await music.check_status(msg);
+            if(res === true)    
+                await music.play(msg);
             // 播放音樂
-            await music.play(msg);
+            
         } else {
 
             // 如果使用者不在任何一個語音頻道
             msg.reply('你必須先加入語音頻道');
         }
+        return;
     }
 
     // 如果使用者輸入的內容中包含 !!combo
@@ -266,14 +271,17 @@ client.on('message', async (msg) => {
         // 如果使用者在語音頻道中
         if (msg.member.voice.channel) {
             //檢查機器人status
-            await music.check_status(msg);
+            let res = await music.check_status(msg);
+            if(res === true)    
+                await music.combo(msg);
             //播放整個清單
-            await music.combo(msg);
+                
         } else {
 
             // 如果使用者不在任何一個語音頻道
             msg.reply('你必須先加入語音頻道');
         }
+        return;
     }
 
     // !!resume
@@ -281,6 +289,7 @@ client.on('message', async (msg) => {
 
         // 恢復音樂
         music.resume(msg);
+        return;
     }
 
     // !!pause
@@ -288,6 +297,7 @@ client.on('message', async (msg) => {
 
         // 暫停音樂
         music.pause(msg);
+        return;
     }
 
     // !!skip
@@ -295,6 +305,7 @@ client.on('message', async (msg) => {
 
         // 跳過音樂
         music.skip(msg);
+        return;
     }
 
     // !!queue
@@ -302,6 +313,7 @@ client.on('message', async (msg) => {
 
         // 查看隊列
         music.nowQueue(msg);
+        return;
     }
 
     // !!leave
@@ -309,6 +321,7 @@ client.on('message', async (msg) => {
 
         // 機器人離開頻道
         music.leave(msg);
+        return;
     }
 });
 
