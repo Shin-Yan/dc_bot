@@ -212,7 +212,6 @@ const music = new Music();
 
 // 當 Bot 接收到訊息時的事件
 client.on('message', async (msg) => {
-    console.log(msg)
     // 如果發送訊息的地方不是語音群（可能是私人），就 return
     if (!msg.guild) return;
 

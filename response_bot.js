@@ -15,7 +15,6 @@ client.on('message', msg => {
     // 如果訊息的內容是 'ping'
     
     if(msg.author.bot) return;
-    console.log(msg.author.username, msg.author.id);
     if (msg.content === 'ping') {
         // 則 Bot 回應 'Pong'
         msg.reply('pong');
