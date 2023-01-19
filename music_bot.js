@@ -59,9 +59,7 @@ class Music {
         }
 
     }
-
-    async play(msg) {
-
+    async check_status(msg){
         // 語音群的 ID
         const guildID = msg.guild.id;
 
@@ -76,7 +74,9 @@ class Music {
             msg.channel.send('請先將機器人 `!!join` 重新加入頻道');
             return;
         }
-
+    }
+    async play(msg) {
+        const guildID = msg.guild.id;
         // 處理字串，將 !!play 字串拿掉，只留下 YouTube 網址
         const musicURL = msg.content.replace(`${prefix}play`, '').trim();
         try {
@@ -107,6 +107,27 @@ class Music {
             console.log(e);
         }
 
+    }
+
+    async combo(msg){
+        // 讀取 .txt檔 格式如下 <combo name>_list, ex: bocchi_list
+        let combo_name = msg.content.replace(`${prefix}combo`, '').trim();
+            
+        // 此combo有在list中
+        if (combo_list.indexOf(combo_name) > -1){
+            combo_name = 'combos/'+combo_name + '_list.txt';
+            //打開.txt檔, 將其content切割放入List
+            const fileContent = fs.readFileSync(combo_name);
+            const line = fileContent.toString().split('\n');
+            line.forEach(async(element) => {
+                msg.content = element;
+                await(music.play(msg));
+            });
+        }
+        else{
+            msg.reply('此combo不在list中')
+            return;
+        }
     }
 
     playMusic(msg, guildID, musicInfo) {
@@ -228,6 +249,8 @@ client.on('message', async (msg) => {
         // 如果使用者在語音頻道中
         if (msg.member.voice.channel) {
 
+            //檢查機器人status
+            await music.check_status(msg);
             // 播放音樂
             await music.play(msg);
         } else {
@@ -242,24 +265,10 @@ client.on('message', async (msg) => {
 
         // 如果使用者在語音頻道中
         if (msg.member.voice.channel) {
-            // 讀取 .txt檔 格式如下 <combo name>_list, ex: bocchi_list
-            let combo_name = msg.content.replace(`${prefix}combo`, '').trim();
-            
-            // 此combo有在list中
-            if (combo_list.indexOf(combo_name) > -1){
-                combo_name = 'combos/'+combo_name + '_list.txt';
-                //打開.txt檔, 將其content切割放入List
-                const fileContent = fs.readFileSync(combo_name);
-                const line = fileContent.split('\n');
-                line.forEach(element => {
-                    await(music.play(element));
-                });
-            }
-            else{
-                msg.reply('此combo不在list中')
-                return;
-            }
-        
+            //檢查機器人status
+            await music.check_status(msg);
+            //播放整個清單
+            await music.combo(msg);
         } else {
 
             // 如果使用者不在任何一個語音頻道
