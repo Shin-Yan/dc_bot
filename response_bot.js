@@ -4,7 +4,7 @@ const client = new Discord.Client();
 const Bingo = require('./bingo_bot');
 const config = require('./config.json');
 var previous_msg=undefined;
-var vtList = ['aqua','pekora','suisei','rushia','ayame','marine','botan','gura','polka','shion','towa','yuka','iroha','chloe','shishiro']
+var vtList = ['aqua','pekora','suisei','rushia','ayame','marine','botan','gura','polka','shion','towa','yuka','iroha','chloe','shishiro','cocoa']
 // 連上線時的事件
 client.on('ready', () => {
     console.log(`Logged in as ${client.user.tag}!`);
@@ -56,7 +56,7 @@ client.on('message', msg => {
         }
     }
     vtList.forEach(vtName =>{
-        if(msg.content.toLowerCase().includes(vtName)){
+        if(msg.content.toLowerCase().includes(vtName) && msg.author.username !== '我是不是又要再問'){
             msg.reply(vtName.charAt(0).toUpperCase() + vtName.slice(1) +'是誰?');
             previous_msg = msg.content;
             return;

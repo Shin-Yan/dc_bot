@@ -3,6 +3,8 @@ const ytdl = require('ytdl-core');
 const { token } = require('./token.json');
 const { prefix } = require('./config.json');
 const client = new Client();
+const fs = require('fs');
+const combo_list = ['bocchi'];
 
 // 建立一個類別來管理 Property 及 Method
 class Music {
@@ -77,7 +79,6 @@ class Music {
 
         // 處理字串，將 !!play 字串拿掉，只留下 YouTube 網址
         const musicURL = msg.content.replace(`${prefix}play`, '').trim();
-
         try {
 
             // 取得 YouTube 影片資訊
@@ -211,7 +212,7 @@ const music = new Music();
 
 // 當 Bot 接收到訊息時的事件
 client.on('message', async (msg) => {
-
+    console.log(msg)
     // 如果發送訊息的地方不是語音群（可能是私人），就 return
     if (!msg.guild) return;
 
@@ -230,6 +231,36 @@ client.on('message', async (msg) => {
 
             // 播放音樂
             await music.play(msg);
+        } else {
+
+            // 如果使用者不在任何一個語音頻道
+            msg.reply('你必須先加入語音頻道');
+        }
+    }
+
+    // 如果使用者輸入的內容中包含 !!combo
+    if (msg.content.indexOf(`${prefix}combo`) > -1) {
+
+        // 如果使用者在語音頻道中
+        if (msg.member.voice.channel) {
+            // 讀取 .txt檔 格式如下 <combo name>_list, ex: bocchi_list
+            let combo_name = msg.content.replace(`${prefix}combo`, '').trim();
+            
+            // 此combo有在list中
+            if (combo_list.indexOf(combo_name) > -1){
+                combo_name = 'combos/'+combo_name + '_list.txt';
+                //打開.txt檔, 將其content切割放入List
+                const fileContent = fs.readFileSync(combo_name);
+                const line = fileContent.split('\n');
+                line.forEach(element => {
+                    await(music.play(element));
+                });
+            }
+            else{
+                msg.reply('此combo不在list中')
+                return;
+            }
+        
         } else {
 
             // 如果使用者不在任何一個語音頻道
