@@ -121,9 +121,9 @@ class Music {
             //打開.txt檔, 將其content切割放入List
             const fileContent = fs.readFileSync(combo_name);
             const line = fileContent.toString().split('\n');
-            line.forEach(async(element) => {
+            line.forEach(element => {
                 msg.content = element;
-                await(music.play(msg));
+                music.play(msg);
             });
         }
         else{
