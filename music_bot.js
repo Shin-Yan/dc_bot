@@ -4,7 +4,7 @@ const { token } = require('./token.json');
 const { prefix } = require('./config.json');
 const client = new Client();
 const fs = require('fs');
-const combo_list = ['bocchi'];
+const combo_list = ['bochi'];
 
 // 建立一個類別來管理 Property 及 Method
 class Music {
