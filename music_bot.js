@@ -4,7 +4,7 @@ const { token } = require('./token.json');
 const { prefix } = require('./config.json');
 const client = new Client();
 const fs = require('fs');
-const combo_list = ['bochi'];
+const combo_list = ['bochi','hillsong','guang','english','OP'];
 
 // 建立一個類別來管理 Property 及 Method
 class Music {
@@ -23,6 +23,9 @@ class Music {
          *     724145832802385970: false
          * }
          */
+        this.continue = false;
+        this.lastplay = "";
+        this.conti_type = "";
         this.isPlaying = {};
 
         /**
@@ -47,7 +50,6 @@ class Music {
         // https://discord.js.org/#/docs/main/stable/class/StreamDispatcher
         this.dispatcher = {};
     }
-
     async join(msg) {
 
         // 如果使用者正在頻道中
@@ -122,8 +124,8 @@ class Music {
             const fileContent = fs.readFileSync(combo_name);
             const line = fileContent.toString().split('\n');
             for(let index in line){
-	    	msg.content = line[index];
-		await(music.play(msg));
+		        msg.content = line[index];
+	    	await(music.play(msg));
 	    }
         }
         else{
@@ -131,7 +133,24 @@ class Music {
             return;
         }
     }
-
+    async continue_play(msg){
+        this.continue = true;
+        const musicURL = msg.content.replace(`${prefix}continue play`, '').trim();
+        this.lastplay = musicURL;
+        this.conti_type = "single";
+        msg.content = musicURL;
+        
+        await(music.play(msg));
+    }
+    async continue_combo(msg){
+        this.continue = true;
+        const combo_name = msg.content.replace(`${prefix}continue combo`, '').trim();
+        this.lastplay = combo_name;
+        this.conti_type = "combo";
+        msg.content = combo_name;
+        
+        await(music.combo(msg));
+    }
     playMusic(msg, guildID, musicInfo) {
         // 提示播放音樂
         msg.channel.send(`播放音樂：${musicInfo.name}`);
@@ -153,13 +172,33 @@ class Music {
                 this.playMusic(msg, guildID, this.queue[guildID][0]);
             } else {
                 this.isPlaying[guildID] = false;
-                msg.channel.send('目前沒有音樂了，請加入音樂 :D');
+                if(this.continue){
+                    msg.channel.send(`沒有音樂了 重複播放`);
+                    // let tmpmsg = {content:this.lastplay, guild:{id:guildID}};
+                    if(this.conti_type === 'single'){
+                        msg.content = this.lastplay;
+                        this.play(msg);
+                    }
+                    else if(this.conti_type === 'combo'){
+                        msg.content = this.lastplay;
+                        this.combo(msg);
+                    }
+                }
+                else{
+                    msg.channel.send('目前沒有音樂了，請加入音樂 :D');
+                }
             }
 
         });
 
     }
+    stop(msg){
+        this.lastplay='';
+        this.conti_type='';
+        this.continue = false;
 
+        msg.channel.send('停止重複撥放');
+    }
     resume(msg) {
 
         if (this.dispatcher[msg.guild.id]) {
@@ -284,11 +323,41 @@ client.on('message', async (msg) => {
         return;
     }
 
+    if (msg.content.indexOf(`${prefix}continue`) > -1) {
+
+        // 如果使用者在語音頻道中
+        if (msg.member.voice.channel) {
+            //檢查機器人status
+            let res = await music.check_status(msg);
+            if(res === true){
+                if (msg.content.indexOf(`play`) > -1) {
+                    await music.continue_play(msg);
+                }
+                if (msg.content.indexOf(`combo`) > -1) {
+                    await music.continue_combo(msg);
+                }
+            }    
+                
+        } else {
+
+            // 如果使用者不在任何一個語音頻道
+            msg.reply('你必須先加入語音頻道');
+        }
+        return;
+    }
+
     // !!resume
     if (msg.content === `${prefix}resume`) {
 
         // 恢復音樂
         music.resume(msg);
+        return;
+    }
+
+    if (msg.content === `${prefix}stop`) {
+
+        // 恢復音樂
+        music.stop(msg);
         return;
     }
 
