@@ -67,14 +67,16 @@ class Music {
 
         // 如果 Bot 還沒加入該語音群的語音頻道
         if (!this.connection[guildID]) {
-            msg.channel.send('請先將機器人 `!!join` 加入頻道');
-            return false;
+            // msg.channel.send('請先將機器人 `!!join` 加入頻道');
+            await this.join(msg);
+            // return false;
         }
 
         // 如果 Bot leave 後又未加入語音頻道
         if (this.connection[guildID].status === 4) {
-            msg.channel.send('請先將機器人 `!!join` 重新加入頻道');
-            return false;
+            // msg.channel.send('請先將機器人 `!!join` 重新加入頻道');
+            await this.join(msg);
+            // return false;
         }
 
         return true;
