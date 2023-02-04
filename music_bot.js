@@ -79,10 +79,14 @@ class Music {
 
         return true;
     }
-    async play(msg) {
+    async play(msg, insert = 0) {
         const guildID = msg.guild.id;
+        let musicURL;
         // 處理字串，將 !!play 字串拿掉，只留下 YouTube 網址
-        const musicURL = msg.content.replace(`${prefix}play`, '').trim();
+        if(insert === 0)
+            musicURL = msg.content.replace(`${prefix}play`, '').trim();
+        else if(insert === 1)
+            musicURL = msg.content.replace(`${prefix}insert`, '').trim();
         try {
 
             // 取得 YouTube 影片資訊
@@ -93,15 +97,25 @@ class Music {
             if (!this.queue[guildID]) {
                 this.queue[guildID] = [];
             }
-
-            this.queue[guildID].push({
-                name: info.title,
-                url: musicURL
-            });
+            if(insert === 0){
+                this.queue[guildID].push({
+                    name: info.title,
+                    url: musicURL
+                });
+            }
+            else if(insert === 1){
+                this.queue[guildID].unshift({
+                    name: info.title,
+                    url: musicURL
+                });
+            }
 
             // 如果目前正在播放歌曲就加入隊列，反之則播放歌曲
             if (this.isPlaying[guildID]) {
-                msg.channel.send(`歌曲加入隊列：${info.title}`);
+                if(insert === 0)
+                    msg.channel.send(`歌曲加入隊列：${info.title}`);
+                else
+                    msg.channel.send(`歌曲插播：${info.title}`);
             } else {
                 this.isPlaying[guildID] = true;
                 this.playMusic(msg, guildID, this.queue[guildID][0]);
@@ -294,6 +308,26 @@ client.on('message', async (msg) => {
             let res = await music.check_status(msg);
             if(res === true)    
                 await music.play(msg);
+            // 播放音樂
+            
+        } else {
+
+            // 如果使用者不在任何一個語音頻道
+            msg.reply('你必須先加入語音頻道');
+        }
+        return;
+    }
+
+    // 如果使用者輸入的內容中包含 !!insert
+    if (msg.content.indexOf(`${prefix}insert`) > -1) {
+
+        // 如果使用者在語音頻道中
+        if (msg.member.voice.channel) {
+
+            //檢查機器人status
+            let res = await music.check_status(msg);
+            if(res === true)    
+                await music.play(msg,1);
             // 播放音樂
             
         } else {
