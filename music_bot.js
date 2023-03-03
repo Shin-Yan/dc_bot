@@ -4,7 +4,7 @@ const { token } = require('./token.json');
 const { prefix } = require('./config.json');
 const client = new Client();
 const fs = require('fs');
-const combo_list = ['bochi','hillsong','guang','english','OP'];
+const combo_list = ['bochi','hillsong','guang','english','OP','red','tukuyomi'];
 
 // 建立一個類別來管理 Property 及 Method
 class Music {
@@ -183,6 +183,33 @@ class Music {
         // 歌曲播放結束時的事件
         this.dispatcher[guildID].on('finish', () => {
 
+            // 如果隊列中有歌曲
+            if (this.queue[guildID].length > 0) {
+                this.playMusic(msg, guildID, this.queue[guildID][0]);
+            } else {
+                this.isPlaying[guildID] = false;
+                if(this.continue){
+                    msg.channel.send(`沒有音樂了 重複播放`);
+                    // let tmpmsg = {content:this.lastplay, guild:{id:guildID}};
+                    if(this.conti_type === 'single'){
+                        msg.content = this.lastplay;
+                        this.play(msg);
+                    }
+                    else if(this.conti_type === 'combo'){
+                        msg.content = this.lastplay;
+                        this.combo(msg);
+                    }
+                }
+                else{
+                    msg.channel.send('目前沒有音樂了，請加入音樂 :D');
+                }
+            }
+
+        });
+
+        //歌曲錯誤終止事件
+        this.dispatcher[guildID].on('error', () => {
+            msg.channel.send("歌曲播放發生錯誤, 跳過當前歌曲");
             // 如果隊列中有歌曲
             if (this.queue[guildID].length > 0) {
                 this.playMusic(msg, guildID, this.queue[guildID][0]);
